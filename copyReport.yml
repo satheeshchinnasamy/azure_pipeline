@@ -1,0 +1,7 @@
+steps:
+- task: CopyFiles@2
+  displayName: 'Copy Files to: $(Build.StagingDirectory)'
+  inputs:
+    SourceFolder: 'extent-test-report'
+    Contents: index.html
+    TargetFolder: '$(Build.StagingDirectory)'

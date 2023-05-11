@@ -1,0 +1,36 @@
+#Your build pipeline references an undefined variable named ‘SMTP_Username’. Create or edit the build pipeline for this YAML file, define the variable on the Variables tab. See https://go.microsoft.com/fwlink/?linkid=865972
+#Your build pipeline references an undefined variable named ‘SMTP_Username’. Create or edit the build pipeline for this YAML file, define the variable on the Variables tab. See https://go.microsoft.com/fwlink/?linkid=865972
+#Your build pipeline references an undefined variable named ‘SMTP_Password’. Create or edit the build pipeline for this YAML file, define the variable on the Variables tab. See https://go.microsoft.com/fwlink/?linkid=865972
+
+steps:
+- powershell: |
+    Set-Location -Path "$(Build.StagingDirectory)";[System.Net.ServicePointManager]::SecurityProtocol = 'TLS12'
+   
+         $date = Get-Date -Format "MM/dd/yyyy"
+   
+         $Email       = 'satheesh.c@hungerrush.com','hari.sr@hungerrush.com'
+         $Subject     = "HUB Test Reports" + " " +"($date)"
+         $SmtpUsername = '$(SMTP_Username)'
+         $SmtpPassword = '$(SMTP_Password)'
+         $body = "Hi Team," + "`r`n`n" + "HUB test reports are attached to this Email. If there are any concerns reach out to QA Team." + "`r`n`n" + "Please don't reply to this email." + "`r`n`n" + "Regards" + "`r`n" + "HUBQA Team"
+         
+         [array]$attachments = Get-ChildItem "$(Build.StagingDirectory)\" *.html
+         
+         $securePassword = ConvertTo-SecureString $SmtpPassword -AsPlainText -Force
+         $credential = New-Object System.Management.Automation.PSCredential ($SmtpUsername, $securePassword)
+         
+         
+         $Msg = @{
+             to           = $Email
+             from         = "noreply.hubtestautomation@hungerrush.com"
+             port         = "587"
+             Body         = $body
+             subject      = $Subject
+             smtpserver   = "smtp.office365.com"
+             Attachments  = $attachments
+             Credential   = $credential
+         }
+         
+         
+         Send-MailMessage @Msg -UseSSL
+  displayName: 'PowerShell Script '
